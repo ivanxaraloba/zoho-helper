@@ -3,14 +3,18 @@ import convert from "xml-js";
 
 export async function POST(req: NextRequest) {
   try {
-    const xmlString = await req.text();
-    const converted = convert.xml2json(xmlString, { compact: true, spaces: 4 }); // You can specify options here
+    const xml = await req.text();
+    const converted = convert.xml2json(xml, { compact: true, spaces: 4 });
 
-    return NextResponse.json(JSON.parse(converted), { status: 200 }); // Parse the JSON string before returning
-  } catch (err: unknown) {
-    // Check if err is an instance of Error for safer type handling
-    const errorMessage =
-      err instanceof Error ? err.message : "Failed to process request";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { data: JSON.parse(converted), error: null },
+      { status: 200 }
+    );
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json(
+      { error: errorMessage, data: null },
+      { status: 500 }
+    );
   }
 }
