@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import convert from "xml-js";
+import { json2xml } from "xml-js";
 
 export async function POST(req: NextRequest) {
   try {
-    const xml = await req.text();
-    const converted = convert.xml2json(xml, { compact: true, spaces: 4 });
+    const json = await req.json();
+    const converted = json2xml(json, { compact: true });
 
-    return NextResponse.json(
-      { data: JSON.parse(converted), error: null },
-      { status: 200 }
-    );
+    return NextResponse.json({ data: converted, error: null }, { status: 200 });
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json(

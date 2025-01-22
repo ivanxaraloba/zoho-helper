@@ -1,0 +1,47 @@
+type ContactType = {
+  lastName: string;
+  country: string | null;
+  modifiedTime: string;
+  secondaryEmail: string | null;
+  city: string | null;
+  customFields: Record<string, any>;
+  description: string | null;
+  title: string | null;
+  type: string | null;
+  ownerId: string;
+  photoURL: string | null;
+  twitter: string | null;
+  street: string | null;
+  createdTime: string;
+  isEndUser: boolean;
+  zohoCRMContact: string | null;
+  id: string;
+  state: string | null;
+  customerHappiness: {
+    badPercentage: string;
+    okPercentage: string;
+    goodPercentage: string;
+  };
+  email: string;
+  zip: string | null;
+  owner: {
+    photoURL: string;
+    firstName: string;
+    lastName: string;
+    emailId: string;
+    id: string;
+    zuid: string;
+  };
+  accountCount: string;
+  cf: Record<string, any>;
+  facebook: string | null;
+  mobile: string | null;
+  layoutId: string;
+  firstName: string | null;
+  accountId: string | null;
+  isAnonymous: boolean;
+  phone: string | null;
+  webUrl: string;
+  isSpam: boolean;
+  account: string | null;
+};

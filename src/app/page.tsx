@@ -1,59 +1,87 @@
 "use client";
 
-import { useState } from "react";
-import axios from "axios";
+import { TypographyH1 } from "@/components/typography/typography-h1";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
+import Link from "next/link";
 
-interface ErrorResponse {
-  error: string;
-}
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useMutation } from "@tanstack/react-query";
+import ButtonLoading from "@/components/ui/button-loading";
+import { ArrowUpRight, Play } from "lucide-react";
 
 export default function Home() {
-  const [xmlInput, setXmlInput] = useState<string>("");
-  const [responseData, setResponseData] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-
-    try {
-      const { data } = await axios.post("/api/xml-to-json", xmlInput, {
-        headers: { "Content-Type": "application/xml" },
-      });
-      setResponseData(data.data);
-    } catch (err) {
-      const errorResponse = err as { response?: { data: ErrorResponse } };
-      setError(errorResponse.response?.data.error || "An error occurred");
-    }
-  };
+  const mutationMigrateDesk = useMutation({
+    mutationFn: async () => {
+      const response = await axios.post("/api/migrate/desk");
+      console.log(response.data);
+    },
+  });
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        XML to JSON Converter
-      </h1>
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
-        <textarea
-          value={xmlInput}
-          onChange={(e) => setXmlInput(e.target.value)}
-          placeholder="Paste your XML here..."
-          className="w-full h-40 p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <Button type="submit" className="w-full">
-          Convert
-        </Button>
-      </form>
-
-      {error && <p className="text-red-500 text-center mt-6">{error}</p>}
-      {responseData && (
-        <div className="mt-6 bg-gray-100 p-4 rounded-md">
-          <h2 className="text-xl font-semibold">Converted JSON:</h2>
-          <pre className="whitespace-pre-wrap break-words mt-2">
-            {JSON.stringify(responseData, null, 2)}
-          </pre>
-        </div>
-      )}
+    <div className="mx-auto justify-center py-3">
+      <TypographyH1 className="text-center">API Services</TypographyH1>
+      <div className="flex flex-wrap justify-center gap-4 mt-10">
+        <Link href="/convert/xml-to-json">
+          <Button variant="outline" className="font-bold flex-col size-48">
+            <div className="grid place-items-center rounded-full border-white">
+              <ArrowUpRight />
+            </div>
+            <span>XML TO JSON</span>
+          </Button>
+        </Link>
+        <Link href="/convert/json-to-xml">
+          <Button variant="outline" className="font-bold flex-col size-48">
+            <div className="grid place-items-center rounded-full border-white">
+              <ArrowUpRight />
+            </div>
+            <span>JSON TO XML</span>
+          </Button>
+        </Link>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="destructive"
+              className="font-bold flex-col size-48"
+            >
+              <div className="grid place-items-center rounded-full border-white">
+                <Play />
+              </div>
+              <span>MIGRATE DESK</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you absolutely sure?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will migrate all your
+                contacts and tickets from the origin desk to the target desk
+                account.
+              </DialogDescription>
+              <DialogFooter>
+                <DialogClose>
+                  <Button variant="secondary">Cancel</Button>
+                </DialogClose>
+                <ButtonLoading
+                  loading={mutationMigrateDesk.isPending}
+                  onClick={() => mutationMigrateDesk.mutate()}
+                >
+                  Execute
+                </ButtonLoading>
+              </DialogFooter>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }
