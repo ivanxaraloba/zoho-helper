@@ -23,7 +23,7 @@ export const configDeskMigration: configDeskMigrationType = {
   },
 };
 
-export const configMappingOwners: Record<"default", string> &
+export const configMappingOwners: Record<"default" | string, string> &
   Record<string, string> = {
   default: "349635000000101033", // Admin - default in case the owner is not found
   // SCauto - Departamento Importador

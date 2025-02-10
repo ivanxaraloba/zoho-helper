@@ -36,7 +36,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader>
         <SidebarGroup>
-          <SidebarMenuButton asChild>
+          <SidebarMenuButton size="lg" asChild>
             <a href="/">
               <Home />
               <span>Home</span>
@@ -50,7 +50,7 @@ export function AppSidebar() {
           <SidebarMenu>
             {items.map(({ title, url, icon: Icon }) => (
               <SidebarMenuItem key={title}>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton size="lg" asChild>
                   <a href={url}>
                     <Icon />
                     <span>{title}</span>

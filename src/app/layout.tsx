@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import Providers from "@/providers/_index";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/ui/app-sidebar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
