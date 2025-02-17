@@ -3,7 +3,7 @@
 // documentation: https://chatgpt.com/share/6760513c-23d0-8013-919a-5ab61423d1bf
 
 import { NextRequest, NextResponse } from "next/server";
-import { chunk, sleep } from "@/utils/helpers";
+import { chunk, log, sleep } from "@/utils/helpers";
 import {
   createTargetTicket,
   countTicketsByOwner,
@@ -15,7 +15,9 @@ export async function POST(req: NextRequest) {
   try {
     console.time("run_time");
 
+    log("error", "teste 1");
     const { ticketId } = await req.json();
+    log("error", { ticketId });
     const tickets: TicketType[] = ticketId
       ? [
           await apiDeskMigration.origin
@@ -23,6 +25,8 @@ export async function POST(req: NextRequest) {
             .then((res) => res.data),
         ]
       : await getOriginTickets({ fromIndex: 0, limit: 100 });
+
+    log("error", tickets);
 
     const chunks = chunk(tickets, 5);
     let createdAll = [];
@@ -39,6 +43,10 @@ export async function POST(req: NextRequest) {
             console.log(
               `--- already exists: ${ticket.ticketNumber} - ${ticket.id}`
             );
+            log("warning", {
+              alreadyExists: true,
+              id: ticket.id,
+            });
             return;
           }
           // create ticket
