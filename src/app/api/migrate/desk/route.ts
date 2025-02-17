@@ -11,15 +11,19 @@ import {
 } from "./actions";
 import { apiDeskMigration } from "@/services/zoho/desk";
 
+interface BodyProps {
+  ticketId?: "string";
+}
+
 export async function POST(req: NextRequest) {
   try {
     console.time("run_time");
 
-    const { ticketId } = await req.json();
-    const tickets: TicketType[] = ticketId
+    const body: BodyProps | null = await req.json().catch(() => null);
+    const tickets: TicketType[] = body?.ticketId
       ? [
           await apiDeskMigration.origin
-            .get(`/tickets/${ticketId}`)
+            .get(`/tickets/${body.ticketId}`)
             .then((res) => res.data),
         ]
       : await getOriginTickets({ fromIndex: 0, limit: 100 });
