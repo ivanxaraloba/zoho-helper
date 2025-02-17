@@ -15,20 +15,14 @@ export async function POST(req: NextRequest) {
   try {
     console.time("run_time");
 
-    const tickets = await getOriginTickets({
-      fromIndex: 0,
-      limit: 100,
-      // viewId: "384538000113056142",
-    });
-
-    // await countTicketsByOwner(tickets);
-    // return NextResponse.json(
-    //   {
-    //     error: null,
-    //     message: "success",
-    //   },
-    //   { status: 200 }
-    // );
+    const { ticketId } = await req.json();
+    const tickets: TicketType[] = ticketId
+      ? [
+          await apiDeskMigration.origin
+            .get(`/tickets/${ticketId}`)
+            .then((res) => res.data),
+        ]
+      : await getOriginTickets({ fromIndex: 0, limit: 100 });
 
     const chunks = chunk(tickets, 5);
     let createdAll = [];
