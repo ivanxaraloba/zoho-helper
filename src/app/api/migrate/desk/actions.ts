@@ -75,9 +75,11 @@ export const getTargetContactId = async (
 export const getOriginTickets = async ({
   fromIndex,
   limit,
+  viewId,
 }: {
   fromIndex: number;
   limit: number;
+  viewId?: string;
 }): Promise<TicketType[]> => {
   console.log("running - getOriginTickets()");
 
@@ -89,7 +91,7 @@ export const getOriginTickets = async ({
     while (moreTickets) {
       const response = await apiDeskMigration.origin.get("/tickets", {
         params: {
-          // viewId: "384538000109190251",
+          viewId,
           from,
           limit,
           departmentIds: configDeskMigration.origin.departmentId,
@@ -143,11 +145,16 @@ export const createTargetTicket = async (
     ];
     keysToRemove.forEach((key) => delete ticketDetails[key]);
 
-    // skip
-    if (!configMappingOwners[ticket.assigneeId]) {
-      log("warning", { assigneeId: ticket.assigneeId, id: ticket.id, ticket });
-      return ticket;
-    }
+    // skip owners with no config
+    // if (!configMappingOwners[ticket.assigneeId]) {
+    //   log("warning", {
+    //     skipped: true,
+    //     assigneeId: ticket.assigneeId,
+    //     id: ticket.id,
+    //     ticket,
+    //   });
+    //   return ticket;
+    // }
 
     const formattedTicket = {
       ...ticketDetails,
@@ -225,4 +232,18 @@ export const createTargetTicket = async (
     await log("error", { createTicket: ticket, error });
     throw err;
   }
+};
+
+export const countTicketsByOwner = async (tickets: TicketType[]) => {
+  const users: Record<string, { numTickets: number; user: string }> = {};
+
+  for (const ticket of tickets) {
+    if (users[ticket.assigneeId]) {
+      users[ticket.assigneeId].numTickets += 1;
+    } else {
+      users[ticket.assigneeId] = { numTickets: 1, user: "" };
+    }
+  }
+
+  log("info", users);
 };

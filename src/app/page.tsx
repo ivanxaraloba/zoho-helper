@@ -1,9 +1,7 @@
 "use client";
 
-import { TypographyH1 } from "@/components/typography/typography-h1";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import Link from "next/link";
 
 import {
   Dialog,
@@ -17,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation } from "@tanstack/react-query";
 import ButtonLoading from "@/components/ui/button-loading";
-import { ArrowUpRight, Play } from "lucide-react";
+import { Play } from "lucide-react";
 
 export default function Home() {
   const mutationMigrateDesk = useMutation({
@@ -28,34 +26,15 @@ export default function Home() {
   });
 
   return (
-    <div className="mx-auto justify-center py-3">
-      <TypographyH1 className="text-center">API Services</TypographyH1>
+    <div className="h-svh grid place-items-center">
       <div className="flex flex-wrap justify-center gap-4 mt-10">
-        <Link href="/convert/xml-to-json">
-          <Button variant="outline" className="font-bold flex-col size-48">
-            <div className="grid place-items-center rounded-full border-white">
-              <ArrowUpRight />
-            </div>
-            <span>XML TO JSON</span>
-          </Button>
-        </Link>
-        <Link href="/convert/json-to-xml">
-          <Button variant="outline" className="font-bold flex-col size-48">
-            <div className="grid place-items-center rounded-full border-white">
-              <ArrowUpRight />
-            </div>
-            <span>JSON TO XML</span>
-          </Button>
-        </Link>
         <Dialog>
           <DialogTrigger asChild>
             <Button
               variant="destructive"
-              className="font-bold flex-col size-48"
+              className="font-bold flex-col size-48 rounded-2xl"
             >
-              <div className="grid place-items-center rounded-full border-white">
-                <Play />
-              </div>
+              <Play />
               <span>MIGRATE DESK</span>
             </Button>
           </DialogTrigger>
@@ -69,9 +48,10 @@ export default function Home() {
               </DialogDescription>
               <DialogFooter>
                 <DialogClose>
-                  <Button variant="secondary">Cancel</Button>
+                  <Button variant="ghost">Cancel</Button>
                 </DialogClose>
                 <ButtonLoading
+                  variant="destructive"
                   loading={mutationMigrateDesk.isPending}
                   onClick={() => mutationMigrateDesk.mutate()}
                 >

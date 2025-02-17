@@ -27,13 +27,13 @@ export const configMappingOwners: Record<"default" | string, string> &
   Record<string, string> = {
   default: "349635000000101033", // Admin - default in case the owner is not found
   // SCauto - Departamento Importador
-  "384538000108627146": "349635000076844613", // Catarina Santos ( outro email / not confirmed ) -> active X
-  "384538000074064007": "349635000076694132", // Diogo Magalhães Carvalho -> active X
-  "384538000081006388": "349635000042246001", // Diogo Sá ( outro email ) -> active X
-  "384538000017076007": "349635000024666001", // Miguel Batouxas -> active X
-  "384538000084995214": "349635000076714331", // Rui Amorim -> active X
+  "384538000108627146": "349635000076844613", // Catarina Santos
+  "384538000074064007": "349635000076694132", // Diogo Magalhães Carvalho
+  "384538000081006388": "349635000042246001", // Diogo Sá
+  "384538000017076007": "349635000024666001", // Miguel Batouxas
+  "384538000084995214": "349635000076714331", // Rui Amorim
   // invativos
-  // "384538000074192154": "349635000076741831", // Carla Freitas
-  // "384538000081006310": "349635000076820397", // Bruna Abreu
-  // "384538000081006346": "349635000076783579", // Bruna Campos
+  "384538000074192154": "349635000076741831", // Carla Freitas
+  // "384538000081006310": "349635000076820397", // Bruna Abreu -> not confirmed
+  // "384538000081006346": "349635000076783579", // Bruna Campos -> not confirmed
 };
