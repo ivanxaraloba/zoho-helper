@@ -15,9 +15,7 @@ export async function POST(req: NextRequest) {
   try {
     console.time("run_time");
 
-    log("error", "teste 1");
     const { ticketId } = await req.json();
-    log("error", { ticketId });
     const tickets: TicketType[] = ticketId
       ? [
           await apiDeskMigration.origin
@@ -25,8 +23,6 @@ export async function POST(req: NextRequest) {
             .then((res) => res.data),
         ]
       : await getOriginTickets({ fromIndex: 0, limit: 100 });
-
-    log("error", tickets);
 
     const chunks = chunk(tickets, 5);
     let createdAll = [];
@@ -36,16 +32,18 @@ export async function POST(req: NextRequest) {
         try {
           // veirfy if exists
           console.log(`- creating ticket: ${ticket.ticketNumber}`);
-          const existsTicket = await apiDeskMigration.target.get(
+          const responseExistsTicket = await apiDeskMigration.target.get(
             `/tickets/search?customField1=cf_imported_num_ticket:${ticket.ticketNumber}`
           );
-          if (existsTicket?.data?.data?.[0]) {
+          const existsTicket = responseExistsTicket?.data?.data?.[0];
+          if (existsTicket) {
             console.log(
               `--- already exists: ${ticket.ticketNumber} - ${ticket.id}`
             );
             log("warning", {
               alreadyExists: true,
-              id: ticket.id,
+              originTicketId: ticket.id,
+              targetTicketId: existsTicket?.id,
             });
             return;
           }
