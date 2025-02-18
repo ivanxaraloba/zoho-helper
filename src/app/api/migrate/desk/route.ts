@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { chunk, log, sleep } from '@/utils/helpers';
 import { createTargetTicket, countTicketsByOwner, getOriginTickets } from './actions';
-import { apiDeskMigration } from '@/services/zoho/desk';
+import { apiDeskMigration } from '@/services/zoho/_client';
 
 interface BodyProps {
   ticketId?: 'string';
