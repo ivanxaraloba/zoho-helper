@@ -16,13 +16,27 @@ Follow these steps to run the project locally:
 
 <br />
 
+# Zoho Desk Migration Setup
 
-# Setup Desk Migration
+1. **Complete these steps for each project (origin + target)**
 
-1. Open the file `setup-migration-desk.ts`.
+   - ***Create a Self Client***  
+   Go to [Zoho API Console](https://api-console.zoho.com/) and create a new Self Client with the following scopes:  
+      ```bash
+      Desk.tickets.ALL, Desk.tasks.ALL, Desk.settings.ALL, Desk.events.ALL, Desk.search.READ, Desk.contacts.ALL
+      ```
 
-2. Update the configuration object:
-   - Set the `origin` property to the project where tickets/contacts are being fetched from.
-   - Set the `target` property to the project that will receive the imported data.
-   
-3. Send a POST request to the `api/migrate/desk` endpoint to initiate the migration.
+   - ***Generate Tokens***  
+   Generate a `refresh_token` and `access_token`.
+
+   - ***Store Tokens***  
+   Add the project tokens/keys as a new row in your database.
+
+2. **Update Configuration**  
+   - Open `setup-migration-desk.ts`.
+   - Set the `origin` to the project you're migrating data from.
+   - Set the `target` to the project that will receive the data.
+
+3. **Initiate Migration**  
+   Send a POST request to the `api/migrate/desk` endpoint to start the migration.
+

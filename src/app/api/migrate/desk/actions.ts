@@ -7,7 +7,7 @@ import { formatDatetime, log } from "@/utils/helpers";
 import { fileTypeFromBuffer } from "file-type";
 
 export const getTargetContactId = async (
-  originContactEmail: string
+  originContactEmail: string,
 ): Promise<string | undefined> => {
   console.log("Running - getTargetContactId()");
 
@@ -16,7 +16,7 @@ export const getTargetContactId = async (
   try {
     // Attempt to fetch the target contact
     const targetResponse = await apiDeskMigration.target.get(
-      `/contacts/search?email=${originContactEmail}`
+      `/contacts/search?email=${originContactEmail}`,
     );
     const targetContact = targetResponse?.data?.data?.[0] as ContactType;
     console.log({ targetContact });
@@ -27,13 +27,13 @@ export const getTargetContactId = async (
 
     // If target contact doesn't exist, fetch the origin contact
     const originResponse = await apiDeskMigration.origin.get(
-      `/contacts/search?email=${originContactEmail}`
+      `/contacts/search?email=${originContactEmail}`,
     );
     const originContact = originResponse?.data?.data?.[0] as ContactType;
 
     if (!originContact) {
       console.log(
-        `-----------> Origin contact not found ${originContactEmail}`
+        `-----------> Origin contact not found ${originContactEmail}`,
       );
       return undefined;
     }
@@ -61,7 +61,7 @@ export const getTargetContactId = async (
     // Create a new target contact with the sanitized origin contact
     const createResponse = await apiDeskMigration.target.post(
       "/contacts",
-      originContact
+      originContact,
     );
 
     return createResponse?.data?.id;
@@ -114,13 +114,13 @@ export const getOriginTickets = async ({
 };
 
 export const createTargetTicket = async (
-  ticket: TicketType
+  ticket: TicketType,
 ): Promise<TicketType> => {
   console.log("running - createTargetTicket()");
 
   try {
     const ticketResponse = await apiDeskMigration.origin.get(
-      `/tickets/${ticket.id}`
+      `/tickets/${ticket.id}`,
     );
     const ticketDetails = ticketResponse.data;
 
@@ -170,13 +170,13 @@ export const createTargetTicket = async (
 
     const createdTicketResponse = await apiDeskMigration.target.post(
       "/tickets",
-      formattedTicket
+      formattedTicket,
     );
 
     const createdTicket = createdTicketResponse.data;
 
     const commentsResponse = await apiDeskMigration.origin.get(
-      `/tickets/${ticket.id}/comments`
+      `/tickets/${ticket.id}/comments`,
     );
 
     const comments = commentsResponse.data.data || [];
@@ -187,12 +187,12 @@ export const createTargetTicket = async (
           contentType: "html",
           content: comment.content,
           attachmentIds: comment.attachments.map((a: any) => a.id),
-        }
+        },
       );
     }
 
     const attachmentsResponse = await apiDeskMigration.origin.get(
-      `/tickets/${ticket.id}/attachments`
+      `/tickets/${ticket.id}/attachments`,
     );
 
     const attachments = attachmentsResponse.data.data;
@@ -201,7 +201,7 @@ export const createTargetTicket = async (
         `/tickets/${ticket.id}/attachments/${attachment.id}/content?orgId=680853844`,
         {
           responseType: "arraybuffer",
-        }
+        },
       );
 
       const buffer = Buffer.from(attachmentResponse.data);
@@ -221,7 +221,7 @@ export const createTargetTicket = async (
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
     }
 

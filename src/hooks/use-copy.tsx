@@ -35,7 +35,9 @@ export const useCopy = (timeout: number = 2000) => {
       }
     } catch (e) {
       throw new Error(
-        e instanceof Error ? e.message : "Unknown error occurred while copying."
+        e instanceof Error
+          ? e.message
+          : "Unknown error occurred while copying.",
       );
     }
   };

@@ -11,7 +11,7 @@ export const chunk = (input: any[], size: number) => {
 
 export const log = async (
   type: "success" | "error" | "warning" | "info",
-  notes: any
+  notes: any,
 ) => {
   await axios.post("https://lobaadmin-zohofunctionstogit.vercel.app/api/logs", {
     type,
@@ -27,4 +27,3 @@ export const sleep = (ms: number) =>
 export const formatDatetime = (date: string) => {
   return formatInTimeZone(date, "Europe/Lisbon", "yyyy-MM-dd HH:mm:ss");
 };
-
