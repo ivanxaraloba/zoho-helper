@@ -1,73 +1,59 @@
-import {
-  configDeskMigration,
-  configMappingOwners,
-} from "@/configs/setup-migation-desk";
-import { apiDeskMigration } from "@/services/zoho/desk";
-import { formatDatetime, log } from "@/utils/helpers";
-import { fileTypeFromBuffer } from "file-type";
+import { configDeskMigration, configMappingOwners } from '@/configs/setup-migation-desk';
+import { apiDeskMigration } from '@/services/zoho/_client';
+import { formatDatetime, log } from '@/utils/helpers';
+import { fileTypeFromBuffer } from 'file-type';
 
-export const getTargetContactId = async (
-  originContactEmail: string,
-): Promise<string | undefined> => {
-  console.log("Running - getTargetContactId()");
+export const getTargetContactId = async (originContactEmail: string): Promise<string | undefined> => {
+  console.log('Running - getTargetContactId()');
 
   console.log(originContactEmail);
 
   try {
     // Attempt to fetch the target contact
-    const targetResponse = await apiDeskMigration.target.get(
-      `/contacts/search?email=${originContactEmail}`,
-    );
+    const targetResponse = await apiDeskMigration.target.get(`/contacts/search?email=${originContactEmail}`);
     const targetContact = targetResponse?.data?.data?.[0] as ContactType;
     console.log({ targetContact });
 
     if (targetContact) return targetContact.id;
 
-    console.log("Target contact not found");
+    console.log('Target contact not found');
 
     // If target contact doesn't exist, fetch the origin contact
-    const originResponse = await apiDeskMigration.origin.get(
-      `/contacts/search?email=${originContactEmail}`,
-    );
+    const originResponse = await apiDeskMigration.origin.get(`/contacts/search?email=${originContactEmail}`);
     const originContact = originResponse?.data?.data?.[0] as ContactType;
 
     if (!originContact) {
-      console.log(
-        `-----------> Origin contact not found ${originContactEmail}`,
-      );
+      console.log(`-----------> Origin contact not found ${originContactEmail}`);
       return undefined;
     }
 
     // Remove unnecessary keys from the origin contact
     const keysToRemove: Array<keyof ContactType> = [
-      "owner",
-      "isEndUser",
-      "accountCount",
-      "isAnonymous",
-      "account",
-      "layoutId",
-      "webUrl",
-      "isSpam",
-      "createdTime",
-      "modifiedTime",
-      "customFields",
-      "ownerId",
-      "accountId",
+      'owner',
+      'isEndUser',
+      'accountCount',
+      'isAnonymous',
+      'account',
+      'layoutId',
+      'webUrl',
+      'isSpam',
+      'createdTime',
+      'modifiedTime',
+      'customFields',
+      'ownerId',
+      'accountId',
     ];
     keysToRemove.forEach((key) => delete originContact[key]);
 
     console.log({ originContact });
 
     // Create a new target contact with the sanitized origin contact
-    const createResponse = await apiDeskMigration.target.post(
-      "/contacts",
-      originContact,
-    );
+    const createResponse = await apiDeskMigration.target.post('/contacts', originContact);
 
     return createResponse?.data?.id;
   } catch (err) {
-    const error = (err as any)?.response?.data ?? "Unknown error data";
-    await log("error", { getTargetContactId: error });
+    const error = (err as any)?.response?.data ?? 'Unknown error data';
+    await log('error', { getTargetContactId: error });
     return undefined;
   }
 };
@@ -81,7 +67,7 @@ export const getOriginTickets = async ({
   limit: number;
   viewId?: string;
 }): Promise<TicketType[]> => {
-  console.log("running - getOriginTickets()");
+  console.log('running - getOriginTickets()');
 
   try {
     let tickets: any = [];
@@ -89,7 +75,7 @@ export const getOriginTickets = async ({
     let moreTickets = true;
 
     while (moreTickets) {
-      const response = await apiDeskMigration.origin.get("/tickets", {
+      const response = await apiDeskMigration.origin.get('/tickets', {
         params: {
           viewId,
           from,
@@ -107,41 +93,37 @@ export const getOriginTickets = async ({
     }
     return tickets;
   } catch (err) {
-    const error = (err as any)?.response?.data ?? "Unknown error data";
-    await log("error", { getTickets: error });
+    const error = (err as any)?.response?.data ?? 'Unknown error data';
+    await log('error', { getTickets: error });
     throw err;
   }
 };
 
-export const createTargetTicket = async (
-  ticket: TicketType,
-): Promise<TicketType> => {
-  console.log("running - createTargetTicket()");
+export const createTargetTicket = async (ticket: TicketType): Promise<TicketType> => {
+  console.log('running - createTargetTicket()');
 
   try {
-    const ticketResponse = await apiDeskMigration.origin.get(
-      `/tickets/${ticket.id}`,
-    );
+    const ticketResponse = await apiDeskMigration.origin.get(`/tickets/${ticket.id}`);
     const ticketDetails = ticketResponse.data;
 
     const keysToRemove: Array<keyof TicketType> = [
-      "id",
-      "layoutId",
-      "layoutDetails",
-      "sentiment",
-      "onholdTime",
-      "isOverDue",
-      "isResponseOverdue",
-      "isSpam",
-      "isArchived",
-      "modifiedBy",
-      "followerCount",
-      "slaId",
-      "createdBy",
-      "modifiedBy",
-      "responseDueDate",
-      "tagCount",
-      "isEscalated",
+      'id',
+      'layoutId',
+      'layoutDetails',
+      'sentiment',
+      'onholdTime',
+      'isOverDue',
+      'isResponseOverdue',
+      'isSpam',
+      'isArchived',
+      'modifiedBy',
+      'followerCount',
+      'slaId',
+      'createdBy',
+      'modifiedBy',
+      'responseDueDate',
+      'tagCount',
+      'isEscalated',
     ];
     keysToRemove.forEach((key) => delete ticketDetails[key]);
 
@@ -168,68 +150,54 @@ export const createTargetTicket = async (
       },
     };
 
-    const createdTicketResponse = await apiDeskMigration.target.post(
-      "/tickets",
-      formattedTicket,
-    );
+    const createdTicketResponse = await apiDeskMigration.target.post('/tickets', formattedTicket);
 
     const createdTicket = createdTicketResponse.data;
 
-    const commentsResponse = await apiDeskMigration.origin.get(
-      `/tickets/${ticket.id}/comments`,
-    );
+    const commentsResponse = await apiDeskMigration.origin.get(`/tickets/${ticket.id}/comments`);
 
     const comments = commentsResponse.data.data || [];
     for (const comment of comments) {
-      await apiDeskMigration.target.post(
-        `/tickets/${createdTicket.id}/comments`,
-        {
-          contentType: "html",
-          content: comment.content,
-          attachmentIds: comment.attachments.map((a: any) => a.id),
-        },
-      );
+      await apiDeskMigration.target.post(`/tickets/${createdTicket.id}/comments`, {
+        contentType: 'html',
+        content: comment.content,
+        attachmentIds: comment.attachments.map((a: any) => a.id),
+      });
     }
 
-    const attachmentsResponse = await apiDeskMigration.origin.get(
-      `/tickets/${ticket.id}/attachments`,
-    );
+    const attachmentsResponse = await apiDeskMigration.origin.get(`/tickets/${ticket.id}/attachments`);
 
     const attachments = attachmentsResponse.data.data;
     for (const attachment of attachments) {
       const attachmentResponse = await apiDeskMigration.origin.get(
         `/tickets/${ticket.id}/attachments/${attachment.id}/content?orgId=680853844`,
         {
-          responseType: "arraybuffer",
+          responseType: 'arraybuffer',
         },
       );
 
       const buffer = Buffer.from(attachmentResponse.data);
       const fileType = await fileTypeFromBuffer(buffer);
-      const mimeType = fileType?.mime || "application/octet-stream";
+      const mimeType = fileType?.mime || 'application/octet-stream';
 
       const fileBlob = new Blob([buffer], { type: mimeType });
       const file = new File([fileBlob], attachment.name, { type: mimeType });
 
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append('file', file);
 
-      await apiDeskMigration.target.post(
-        `/tickets/${createdTicket.id}/attachments`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      await apiDeskMigration.target.post(`/tickets/${createdTicket.id}/attachments`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
         },
-      );
+      });
     }
 
-    await log("success", { createTicket: formattedTicket });
+    await log('success', { createTicket: formattedTicket });
     return createdTicket;
   } catch (err) {
-    const error = (err as any)?.response?.data ?? "Unknown error data";
-    await log("error", { createTicket: ticket, error });
+    const error = (err as any)?.response?.data ?? 'Unknown error data';
+    await log('error', { createTicket: ticket, error });
     throw err;
   }
 };
@@ -241,9 +209,9 @@ export const countTicketsByOwner = async (tickets: TicketType[]) => {
     if (users[ticket.assigneeId]) {
       users[ticket.assigneeId].numTickets += 1;
     } else {
-      users[ticket.assigneeId] = { numTickets: 1, user: "" };
+      users[ticket.assigneeId] = { numTickets: 1, user: '' };
     }
   }
 
-  log("info", users);
+  log('info', users);
 };
