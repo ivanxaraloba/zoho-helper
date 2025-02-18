@@ -2,31 +2,26 @@
 // Desk.tickets.ALL Desk.tasks.ALL Desk.settings.ALL Desk.events.ALL Desk.search.READ Desk.contacts.ALL
 // documentation: https://chatgpt.com/share/6760513c-23d0-8013-919a-5ab61423d1bf
 
-import { NextRequest, NextResponse } from "next/server";
-import { chunk, log, sleep } from "@/utils/helpers";
-import {
-  createTargetTicket,
-  countTicketsByOwner,
-  getOriginTickets,
-} from "./actions";
-import { apiDeskMigration } from "@/services/zoho/desk";
+import { NextRequest, NextResponse } from 'next/server';
+import { chunk, log, sleep } from '@/utils/helpers';
+import { createTargetTicket, countTicketsByOwner, getOriginTickets } from './actions';
+import { apiDeskMigration } from '@/services/zoho/desk';
 
 interface BodyProps {
-  ticketId?: "string";
+  ticketId?: 'string';
 }
 
 export async function POST(req: NextRequest) {
   try {
-    console.time("run_time");
+    console.time('run_time');
 
     const body: BodyProps | null = await req.json().catch(() => null);
     const tickets: TicketType[] = body?.ticketId
-      ? [
-          await apiDeskMigration.origin
-            .get(`/tickets/${body.ticketId}`)
-            .then((res) => res.data),
-        ]
-      : await getOriginTickets({ fromIndex: 0, limit: 100 });
+      ? [await apiDeskMigration.origin.get(`/tickets/${body.ticketId}`).then((res) => res.data)]
+      : await getOriginTickets({
+          fromIndex: 0,
+          limit: 100,
+        });
 
     const chunks = chunk(tickets, 5);
     let createdAll = [];
@@ -37,14 +32,12 @@ export async function POST(req: NextRequest) {
           // veirfy if exists
           console.log(`- creating ticket: ${ticket.ticketNumber}`);
           const responseExistsTicket = await apiDeskMigration.target.get(
-            `/tickets/search?customField1=cf_imported_num_ticket:${ticket.ticketNumber}`
+            `/tickets/search?customField1=cf_imported_num_ticket:${ticket.ticketNumber}`,
           );
           const existsTicket = responseExistsTicket?.data?.data?.[0];
           if (existsTicket) {
-            console.log(
-              `--- already exists: ${ticket.ticketNumber} - ${ticket.id}`
-            );
-            log("warning", {
+            console.log(`--- already exists: ${ticket.ticketNumber} - ${ticket.id}`);
+            log('warning', {
               alreadyExists: true,
               originTicketId: ticket.id,
               targetTicketId: existsTicket?.id,
@@ -66,22 +59,30 @@ export async function POST(req: NextRequest) {
 
     createdAll = createdAll.filter(Boolean);
 
-    console.timeEnd("run_time");
+    console.timeEnd('run_time');
 
     return NextResponse.json(
       {
         error: null,
-        message: "success",
-        data: { totalRecords: createdAll?.length },
+        message: 'success',
+        data: {
+          totalRecords: createdAll?.length,
+        },
       },
-      { status: 200 }
+      {
+        status: 200,
+      },
     );
   } catch (err) {
-    const errorMessage =
-      err instanceof Error ? err.message : "Unknown error occurred";
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
     return NextResponse.json(
-      { error: errorMessage, data: null },
-      { status: 500 }
+      {
+        error: errorMessage,
+        data: null,
+      },
+      {
+        status: 500,
+      },
     );
   }
 }

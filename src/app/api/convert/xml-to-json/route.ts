@@ -8,13 +8,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { data: JSON.parse(converted), error: null },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json(
       { error: errorMessage, data: null },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -6,7 +6,7 @@ import { configDeskMigration } from "@/configs/setup-migation-desk";
 
 export const createZohoDeskApiClient = (
   orgId: string,
-  domain: string
+  domain: string,
 ): AxiosInstance => {
   const client = axios.create({
     baseURL: `https://desk.zoho.${domain}/api/v1`,
@@ -32,7 +32,7 @@ export const createZohoDeskApiClient = (
       config.headers.Authorization = `Zoho-oauthtoken ${data.access_token}`;
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(error),
   );
 
   client.interceptors.response.use(
@@ -48,7 +48,7 @@ export const createZohoDeskApiClient = (
           const { access_token } = await zoho.oauth.refreshToken(
             data.refresh_token,
             data.client_id,
-            data.client_secret
+            data.client_secret,
           );
 
           await supabase
@@ -64,7 +64,7 @@ export const createZohoDeskApiClient = (
       }
 
       return Promise.reject(error);
-    }
+    },
   );
 
   return client;
@@ -73,10 +73,10 @@ export const createZohoDeskApiClient = (
 export const apiDeskMigration = {
   origin: createZohoDeskApiClient(
     configDeskMigration.origin.orgId,
-    configDeskMigration.origin.domain
+    configDeskMigration.origin.domain,
   ),
   target: createZohoDeskApiClient(
     configDeskMigration.target.orgId,
-    configDeskMigration.target.domain
+    configDeskMigration.target.domain,
   ),
 };
