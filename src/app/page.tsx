@@ -11,7 +11,8 @@ import { useCopy } from "@/hooks/use-copy";
 import { TypographyH1 } from "@/components/typography/typography-h1";
 import { TypographyMuted } from "@/components/typography/typography-muted";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { METHOD_COLORS } from "@/utils/contants";
+import { APP_URL, METHOD_COLORS } from "@/utils/contants";
+
 
 const apiRoutes = [
   {
@@ -98,10 +99,10 @@ export default function Home() {
                     <h4 className="text-sm font-semibold">Request URL:</h4>
                     <div className="bg-secondary/50 rounded-md p-3 flex">
                       <code className="block w-full text-xs">
-                        {window.location.origin + route.endpoint}
+                        {APP_URL + route.endpoint}
                       </code>
-                      <button onClick={() => copy(window.location.origin + route.endpoint)}>
-                        {isCopied(window.location.origin + route.endpoint) ? (
+                      <button onClick={() => copy(APP_URL + route.endpoint)}>
+                        {isCopied(APP_URL + route.endpoint) ? (
                           <Check className="h-3 w-3" />
                         ) : (
                           <Copy className="h-3 w-3" />
