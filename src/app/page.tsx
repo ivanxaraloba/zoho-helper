@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import ButtonLoading from "@/components/ui/button-loading";
-import { ArrowRight, RefreshCw, Share2, FileJson, FileCode, Copy, Check, ChevronDown } from "lucide-react";
+import { ArrowRight, RefreshCw, Share2, FileJson, FileCode, Copy, Check, ChevronDown, Play } from "lucide-react";
 import { useCopy } from "@/hooks/use-copy";
 import { TypographyH1 } from "@/components/typography/typography-h1";
 import { TypographyMuted } from "@/components/typography/typography-muted";
@@ -80,21 +80,21 @@ export default function Home() {
           <Collapsible key={route.endpoint}>
             <Card>
               <CollapsibleTrigger className="text-start w-full">
-                <CardHeader className="flex-row items-center p-6">
-                  <Badge variant="secondary" style={{ backgroundColor: METHOD_COLORS[route.method] }}>
+                <CardHeader className="flex-row items-center py-3 px-6 gap-6">
+                  <Badge variant="secondary" className="text-[10px] text-white" style={{ backgroundColor: METHOD_COLORS[route.method] }}>
                     {route.method}
                   </Badge>
-                  <div className="ml-6 space-y-1">
-                    <CardTitle>{route.title}</CardTitle>
-                    <CardDescription>{route.description}</CardDescription>
+                  <div className="space-y-1">
+                    <CardTitle className="text-sm">{route.title}</CardTitle>
+                    <CardDescription className="text-xs">{route.description}</CardDescription>
                   </div>
                   <div className="ml-auto flex items-center gap-2">
                     <ChevronDown className="h-4 w-4" />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
-              <CollapsibleContent className="border-t p-6 w-full">
-                <CardContent className="space-y-4 p-0 w-full">
+              <CollapsibleContent className="border-t w-full">
+                <CardContent className="space-y-4 py-3 px-6 w-full">
                   <div className="space-y-2">
                     <h4 className="text-sm font-semibold">Request URL:</h4>
                     <div className="bg-secondary/50 rounded-md p-3 flex">
@@ -134,7 +134,10 @@ export default function Home() {
                   <div className="w-full flex justify-end">
                     {route?.execute && (
                       <Button onClick={() => route.execute(route.bodyParams)}
-                        variant="destructive">Execute</Button>
+                        variant="destructive">
+                        <span>Execute</span>
+                        <Play />
+                      </Button>
                     )}
                   </div>
                 </CardContent>

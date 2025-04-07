@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn("antialiased", inter.className)}>
+      <body className={cn("antialiased dark", inter.className)}>
         <Providers>
           <div className="w-full h-screen flex flex-col">{children}</div>
           <Toaster richColors />
