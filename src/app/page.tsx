@@ -81,7 +81,7 @@ export default function Home() {
             <Card>
               <CollapsibleTrigger className="text-start w-full">
                 <CardHeader className="flex-row items-center p-6">
-                  <Badge variant="secondary" className={METHOD_COLORS[route.method] || "bg-gray-500"}>
+                  <Badge variant="secondary" style={{ backgroundColor: METHOD_COLORS[route.method] }}>
                     {route.method}
                   </Badge>
                   <div className="ml-6 space-y-1">
