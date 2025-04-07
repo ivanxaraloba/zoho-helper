@@ -6,5 +6,5 @@ export const METHOD_COLORS: Record<string, string> = {
     PATCH: "#a855f7"   // purple-500
 };
 
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+export const APP_URL = "https://zoho-helper.vercel.app";
 
