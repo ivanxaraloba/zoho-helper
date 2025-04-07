@@ -5,28 +5,26 @@ export const useCopy = (timeout: number = 2000) => {
   const [copied, setCopied] = useState(false);
   const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({});
 
-  const isCopied = (id?: string | number) => {
-    id = id?.toString();
-    if (id) return copiedMap[id] ?? false;
+  const isCopied = (value?: string) => {
+    if (value) return copiedMap[value] ?? false;
     return copied;
   };
 
-  const copy = async (value: string, id?: string | number) => {
-    id = id?.toString();
+  const copy = async (value: string) => {
     try {
       if (navigator?.clipboard?.writeText) {
         await navigator.clipboard.writeText(value);
 
-        if (copyTimeout && !id) {
+        if (copyTimeout && !value) {
           clearTimeout(copyTimeout);
         }
 
         setCopied(true);
-        if (id) setCopiedMap((prev) => ({ ...prev, [id]: true }));
+        if (value) setCopiedMap((prev) => ({ ...prev, [value]: true }));
 
         const newTimeout = setTimeout(() => {
           setCopied(false);
-          if (id) setCopiedMap((prev) => ({ ...prev, [id]: false }));
+          if (value) setCopiedMap((prev) => ({ ...prev, [value]: false }));
         }, timeout);
 
         setCopyTimeout(newTimeout);
