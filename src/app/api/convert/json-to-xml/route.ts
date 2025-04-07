@@ -3,8 +3,16 @@ import { json2xml } from "xml-js";
 
 export async function POST(req: NextRequest) {
   try {
-    const json = await req.json();
-    const converted = json2xml(json, { compact: true });
+    const body = await req.json();
+
+    if (!body.json) {
+      return NextResponse.json(
+        { error: "Missing json property in request body", data: null },
+        { status: 400 }
+      );
+    }
+
+    const converted = json2xml(body.json, { compact: true });
 
     return NextResponse.json({ data: converted, error: null }, { status: 200 });
   } catch (err) {
