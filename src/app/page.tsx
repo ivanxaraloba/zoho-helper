@@ -12,6 +12,8 @@ import { TypographyH1 } from "@/components/typography/typography-h1";
 import { TypographyMuted } from "@/components/typography/typography-muted";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { APP_URL, METHOD_COLORS } from "@/utils/contants";
+import { log } from "@/utils/helpers";
+import { XML_EXAMPLE } from "@/utils/xml";
 
 
 const apiRoutes = [
@@ -66,12 +68,26 @@ const apiRoutes = [
   }
 ];
 
+
+
+
 export default function Home() {
   const { copy, isCopied } = useCopy();
+
+
+  const testApi = async () => {
+    const response = await axios.post("/api/convert/xml-to-json", {
+      xml: XML_EXAMPLE
+    });
+    console.log(response.data);
+
+    return response.data;
+  }
 
   return (
     <div className="max-w-screen-xl w-full mx-auto p-12">
       <div>
+        <button onClick={() => testApi()}>teste</button>
         <TypographyH1>API Routes</TypographyH1>
         <TypographyMuted>Select an API endpoint to interact with</TypographyMuted>
       </div>
