@@ -1,90 +1,77 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
-import ButtonLoading from "@/components/ui/button-loading";
-import { ArrowRight, RefreshCw, Share2, FileJson, FileCode, Copy, Check, ChevronDown, Play } from "lucide-react";
-import { useCopy } from "@/hooks/use-copy";
-import { TypographyH1 } from "@/components/typography/typography-h1";
-import { TypographyMuted } from "@/components/typography/typography-muted";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { APP_URL, METHOD_COLORS } from "@/utils/contants";
-import { log } from "@/utils/helpers";
-import { XML_EXAMPLE } from "@/utils/xml";
-
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import axios from 'axios';
+import { useMutation } from '@tanstack/react-query';
+import ButtonLoading from '@/components/ui/button-loading';
+import { ArrowRight, RefreshCw, Share2, FileJson, FileCode, Copy, Check, ChevronDown, Play } from 'lucide-react';
+import { useCopy } from '@/hooks/use-copy';
+import { TypographyH1 } from '@/components/typography/typography-h1';
+import { TypographyMuted } from '@/components/typography/typography-muted';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { APP_URL, METHOD_COLORS } from '@/utils/contants';
+import { log } from '@/utils/helpers';
 
 const apiRoutes = [
   {
-    method: "POST",
-    title: "Zoho Desk Migration Tool",
-    description: "Transfer tickets, comments, attachments, and contacts between Zoho Desk instances",
-    endpoint: "/api/migrate/desk",
+    method: 'POST',
+    title: 'Zoho Desk Migration Tool',
+    description: 'Transfer tickets, comments, attachments, and contacts between Zoho Desk instances',
+    endpoint: '/api/migrate/desk',
     icon: <RefreshCw className="h-4 w-4" />,
     bodyParams: [
       {
-        name: "ticketId",
-        type: "string",
-        description: "Optional. Specific ticket ID to migrate. If not provided, migrates multiple tickets",
-        required: false
-      }
+        name: 'ticketId',
+        type: 'string',
+        description: 'Optional. Specific ticket ID to migrate. If not provided, migrates multiple tickets',
+        required: false,
+      },
     ],
     execute: async (data: object = {}) => {
-      const response = await axios.post("/api/migrate/desk", data);
+      const response = await axios.post('/api/migrate/desk', data);
       return response.data;
-    }
+    },
   },
   {
-    method: "POST",
-    title: "JSON to XML Converter",
-    description: "Transform JSON data structures into XML format with preserved hierarchy",
-    endpoint: "/api/convert/json-to-xml",
+    method: 'POST',
+    title: 'JSON to XML Converter',
+    description: 'Transform JSON data structures into XML format with preserved hierarchy',
+    endpoint: '/api/convert/json-to-xml',
     icon: <FileJson className="h-4 w-4" />,
     bodyParams: [
       {
-        name: "json",
-        type: "object",
-        description: "JSON object to convert to XML format",
-        required: true
-      }
-    ]
+        name: 'json',
+        type: 'object',
+        description: 'JSON object to convert to XML format',
+        required: true,
+      },
+    ],
   },
   {
-    method: "POST",
-    title: "XML to JSON Parser",
-    description: "Convert XML documents into structured JSON objects with element preservation",
-    endpoint: "/api/convert/xml-to-json",
+    method: 'POST',
+    title: 'XML to JSON Parser',
+    description: 'Convert XML documents into structured JSON objects with element preservation',
+    endpoint: '/api/convert/xml-to-json',
     icon: <FileCode className="h-4 w-4" />,
     bodyParams: [
       {
-        name: "xml",
-        type: "string",
-        description: "XML string to parse into JSON format",
-        required: true
-      }
-    ]
-  }
+        name: 'xml',
+        type: 'string',
+        description: 'XML string to parse into JSON format',
+        required: true,
+      },
+    ],
+  },
 ];
 
 export default function Home() {
   const { copy, isCopied } = useCopy();
 
-
-  const testApi = async () => {
-    const response = await axios.post("/api/convert/xml-to-json", {
-      xml: XML_EXAMPLE
-    });
-    console.log(response.data);
-
-    return response.data;
-  }
-
   return (
     <div className="max-w-screen-xl w-full mx-auto p-12">
       <div>
-        <button onClick={() => testApi()}>teste</button>
         <TypographyH1>API Routes</TypographyH1>
         <TypographyMuted>Select an API endpoint to interact with</TypographyMuted>
       </div>
@@ -94,7 +81,11 @@ export default function Home() {
             <Card>
               <CollapsibleTrigger className="text-start w-full">
                 <CardHeader className="flex-row items-center py-3 px-6 gap-6">
-                  <Badge variant="secondary" className="text-[10px] text-white" style={{ backgroundColor: METHOD_COLORS[route.method] }}>
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] text-white"
+                    style={{ backgroundColor: METHOD_COLORS[route.method] }}
+                  >
                     {route.method}
                   </Badge>
                   <div className="space-y-1">
@@ -111,9 +102,7 @@ export default function Home() {
                   <div className="space-y-2">
                     <h4 className="text-sm font-semibold">Request URL:</h4>
                     <div className="bg-secondary/50 rounded-md p-3 flex">
-                      <code className="block w-full text-xs">
-                        {APP_URL + route.endpoint}
-                      </code>
+                      <code className="block w-full text-xs">{APP_URL + route.endpoint}</code>
                       <button onClick={() => copy(APP_URL + route.endpoint)}>
                         {isCopied(APP_URL + route.endpoint) ? (
                           <Check className="h-3 w-3" />
@@ -143,18 +132,15 @@ export default function Home() {
                     </div>
                   )}
 
-
                   <div className="w-full flex justify-end">
                     {route?.execute && (
-                      <Button size="sm" onClick={() => route.execute(route.bodyParams)}
-                        variant="destructive">
+                      <Button size="sm" onClick={() => route.execute(route.bodyParams)} variant="destructive">
                         <span>Execute</span>
                         <Play />
                       </Button>
                     )}
                   </div>
                 </CardContent>
-
               </CollapsibleContent>
             </Card>
           </Collapsible>
