@@ -64,6 +64,21 @@ const apiRoutes = [
       },
     ],
   },
+  // {
+  //   method: 'POST',
+  //   title: 'File Reader',
+  //   description: 'Read file contents and metadata from the server',
+  //   endpoint: '/api/files/read',
+  //   icon: <FileCode className="h-4 w-4" />,
+  //   bodyParams: [
+  //     {
+  //       name: 'filepath',
+  //       type: 'string',
+  //       description: 'Absolute path to the file to be read',
+  //       required: true,
+  //     },
+  //   ],
+  // },
 ];
 
 export default function Home() {
