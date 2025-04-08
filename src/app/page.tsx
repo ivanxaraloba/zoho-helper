@@ -68,9 +68,6 @@ const apiRoutes = [
   }
 ];
 
-
-
-
 export default function Home() {
   const { copy, isCopied } = useCopy();
 
@@ -149,7 +146,7 @@ export default function Home() {
 
                   <div className="w-full flex justify-end">
                     {route?.execute && (
-                      <Button onClick={() => route.execute(route.bodyParams)}
+                      <Button size="sm" onClick={() => route.execute(route.bodyParams)}
                         variant="destructive">
                         <span>Execute</span>
                         <Play />
