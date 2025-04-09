@@ -116,16 +116,16 @@ export default function Home() {
                 <CardContent className="space-y-4 py-3 px-6 w-full">
                   <div className="space-y-2">
                     <h4 className="text-sm font-semibold">Request URL:</h4>
-                    <div className="bg-secondary/50 rounded-md p-3 flex">
+                    <button
+                      className="bg-secondary/50 rounded-md p-3 flex w-full text-start items-center"
+                      onClick={() => copy(APP_URL + route.endpoint)}>
                       <code className="block w-full text-xs">{APP_URL + route.endpoint}</code>
-                      <button onClick={() => copy(APP_URL + route.endpoint)}>
-                        {isCopied(APP_URL + route.endpoint) ? (
-                          <Check className="h-3 w-3" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </button>
-                    </div>
+                      {isCopied(APP_URL + route.endpoint) ? (
+                        <Check className="h-3 w-3" />
+                      ) : (
+                        <Copy className="h-3 w-3" />
+                      )}
+                    </button>
                   </div>
 
                   {route.bodyParams && (
