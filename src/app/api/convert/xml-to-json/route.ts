@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { xml2json } from "xml-js";
-import { removeTextKey } from "./actions";
+import { flattenXmlJson } from "./actions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     });
 
     const json = JSON.parse(converted);
-    const formattedJson = removeTextKey(json);
+    const formattedJson = flattenXmlJson(json);
 
     return NextResponse.json(
       { data: formattedJson, error: null },
