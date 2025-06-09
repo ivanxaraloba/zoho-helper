@@ -23,10 +23,10 @@ export async function POST(req: NextRequest) {
     });
 
     const json = JSON.parse(converted);
-    const formattedJson = removeTextKey(json);
+    // const formattedJson = removeTextKey(json);
 
     return NextResponse.json(
-      { data: formattedJson, error: null },
+      { data: json, error: null },
       { status: 200 },
     );
   } catch (err) {
