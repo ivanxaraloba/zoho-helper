@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { xml2json } from "xml-js";
-import { removeTextKey } from "./actions";
+import xml2json from '@hendt/xml2json';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,16 +12,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const converted = xml2json(body.xml, {
-      compact: true,
-      spaces: 4,
-      trim: true,
-      nativeType: true,
-      ignoreDeclaration: true,
-      ignoreInstruction: true,
-    });
-
-    const json = JSON.parse(converted);
+    console.log(body.xml);
+    const json = xml2json(body.xml); // Fixed typo here
+    console.log(json);
     // const formattedJson = removeTextKey(json);
 
     return NextResponse.json(
@@ -30,6 +22,7 @@ export async function POST(req: NextRequest) {
       { status: 200 },
     );
   } catch (err) {
+    console.log(err);
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json(
       { error: errorMessage, data: null },

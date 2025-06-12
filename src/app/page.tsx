@@ -84,8 +84,14 @@ const apiRoutes = [
 export default function Home() {
   const { copy, isCopied } = useCopy();
 
+  const teste = async () => {
+    const response = await axios.post('/api/convert/xml-to-json', { xml: '<person><name>John Doe</name></person>' });
+    console.log(response);
+  };
+
   return (
     <div className="max-w-screen-xl w-full mx-auto p-12">
+      <button onClick={teste}>teste</button>
       <div>
         <TypographyH1>API Routes</TypographyH1>
         <TypographyMuted>Select an API endpoint to interact with</TypographyMuted>
@@ -118,7 +124,8 @@ export default function Home() {
                     <h4 className="text-sm font-semibold">Request URL:</h4>
                     <button
                       className="bg-secondary/50 rounded-md p-3 flex w-full text-start items-center"
-                      onClick={() => copy(APP_URL + route.endpoint)}>
+                      onClick={() => copy(APP_URL + route.endpoint)}
+                    >
                       <code className="block w-full text-xs">{APP_URL + route.endpoint}</code>
                       {isCopied(APP_URL + route.endpoint) ? (
                         <Check className="h-3 w-3" />
