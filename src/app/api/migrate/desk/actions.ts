@@ -5,14 +5,13 @@ import { fileTypeFromBuffer } from 'file-type';
 
 export const getTargetContactId = async (originContactEmail: string): Promise<string | undefined> => {
   console.log('Running - getTargetContactId()');
-
   console.log(originContactEmail);
 
   try {
     // Attempt to fetch the target contact
     const targetResponse = await apiDeskMigration.target.get(`/contacts/search?email=${originContactEmail}`);
     const targetContact = targetResponse?.data?.data?.[0] as ContactType;
-    console.log({ targetContact });
+    console.log({ targetContact: targetContact?.id });
 
     if (targetContact) return targetContact.id;
 
@@ -124,6 +123,7 @@ export const createTargetTicket = async (ticket: TicketType): Promise<TicketType
       'responseDueDate',
       'tagCount',
       'isEscalated',
+      "source"
     ];
     keysToRemove.forEach((key) => delete ticketDetails[key]);
 
@@ -140,6 +140,7 @@ export const createTargetTicket = async (ticket: TicketType): Promise<TicketType
 
     const formattedTicket = {
       ...ticketDetails,
+      status: ticketDetails.statusType,
       departmentId: configDeskMigration.target.departmentId,
       assigneeId: configMappingOwners[ticket.assigneeId],
       contactId: await getTargetContactId(ticket.email),
@@ -149,6 +150,11 @@ export const createTargetTicket = async (ticket: TicketType): Promise<TicketType
         cf_imported_num_ticket: ticketDetails.ticketNumber,
       },
     };
+
+    // console.log("formattedTicket");
+    // console.log("old status", ticketDetails.status);
+    // console.log("statusType", formattedTicket.statusType);
+    // console.log("status", formattedTicket.status);
 
     const createdTicketResponse = await apiDeskMigration.target.post('/tickets', formattedTicket);
 

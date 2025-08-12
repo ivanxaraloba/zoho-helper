@@ -13,26 +13,28 @@ import { TypographyMuted } from '@/components/typography/typography-muted';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { APP_URL, METHOD_COLORS } from '@/utils/contants';
 import { log } from '@/utils/helpers';
+import { supabase } from '@/lib/supabase/client';
+import { Textarea } from '@/components/ui/textarea';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+import { ApiRoute } from '@/types/routes';
 
-const apiRoutes = [
+const apiRoutes: ApiRoute[] = [
   {
     method: 'POST',
     title: 'Zoho Desk Migration Tool',
     description: 'Transfer tickets, comments, attachments, and contacts between Zoho Desk instances',
     endpoint: '/api/migrate/desk',
     icon: <RefreshCw className="h-4 w-4" />,
+    execute: true,
     bodyParams: [
       {
         name: 'ticketId',
         type: 'string',
-        description: 'Optional. Specific ticket ID to migrate. If not provided, migrates multiple tickets',
+        description: 'Optional. Specific ticket ID to migrate. If not provided, migrates all tickets',
         required: false,
       },
     ],
-    execute: async (data: object = {}) => {
-      const response = await axios.post('/api/migrate/desk', data);
-      return response.data;
-    },
   },
   {
     method: 'POST',
@@ -64,25 +66,45 @@ const apiRoutes = [
       },
     ],
   },
-  // {
-  //   method: 'POST',
-  //   title: 'File Reader',
-  //   description: 'Read file contents and metadata from the server',
-  //   endpoint: '/api/files/read',
-  //   icon: <FileCode className="h-4 w-4" />,
-  //   bodyParams: [
-  //     {
-  //       name: 'filepath',
-  //       type: 'string',
-  //       description: 'Absolute path to the file to be read',
-  //       required: true,
-  //     },
-  //   ],
-  // },
 ];
 
 export default function Home() {
   const { copy, isCopied } = useCopy();
+  const [bodyInputs, setBodyInputs] = useState<{ [endpoint: string]: string }>({});
+
+  const getDefaultBody = (route: ApiRoute) => {
+    if (!route.bodyParams) return '';
+    const obj: any = {};
+    route.bodyParams.forEach((param) => {
+      obj[param.name] = param.type === 'object' ? {} : '';
+    });
+    return JSON.stringify(obj, null, 2);
+  };
+
+  // Update mutation to use ApiRoute type
+  const mutationExecute = useMutation({
+    mutationFn: async (route: ApiRoute) => {
+      let body = bodyInputs[route.endpoint] ?? getDefaultBody(route);
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        throw new Error('Invalid JSON in body parameters');
+      }
+      console.log('endpoint', route.endpoint);
+      console.log('body', body);
+
+      const response = await axios.post(route.endpoint, body);
+      console.log('response', response.data);
+
+      return response.data;
+    },
+    onSuccess: async () => {
+      toast.success('Request successful!');
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   return (
     <div className="max-w-screen-xl w-full mx-auto p-12">
@@ -118,7 +140,8 @@ export default function Home() {
                     <h4 className="text-sm font-semibold">Request URL:</h4>
                     <button
                       className="bg-secondary/50 rounded-md p-3 flex w-full text-start items-center"
-                      onClick={() => copy(APP_URL + route.endpoint)}>
+                      onClick={() => copy(APP_URL + route.endpoint)}
+                    >
                       <code className="block w-full text-xs">{APP_URL + route.endpoint}</code>
                       {isCopied(APP_URL + route.endpoint) ? (
                         <Check className="h-3 w-3" />
@@ -147,14 +170,34 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="w-full flex justify-end">
-                    {route?.execute && (
-                      <Button size="sm" onClick={() => route.execute(route.bodyParams)} variant="destructive">
-                        <span>Execute</span>
-                        <Play />
-                      </Button>
-                    )}
-                  </div>
+                  {route.bodyParams && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">Execution Body:</h4>
+                      <Textarea
+                        placeholder="Body Parameters for testing"
+                        className="h-56 resize-none"
+                        value={bodyInputs[route.endpoint] ?? getDefaultBody(route)}
+                        onChange={(e) =>
+                          setBodyInputs({
+                            ...bodyInputs,
+                            [route.endpoint]: e.target.value,
+                          })
+                        }
+                      />
+                      {route?.execute && (
+                        <ButtonLoading
+                          size="sm"
+                          loading={mutationExecute.isPending}
+                          icon={Play}
+                          variant="secondary"
+                          className="w-full py-6"
+                          onClick={() => mutationExecute.mutate(route)}
+                        >
+                          <span>Execute</span>
+                        </ButtonLoading>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </CollapsibleContent>
             </Card>

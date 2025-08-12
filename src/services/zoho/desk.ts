@@ -1,7 +1,8 @@
-import { supabase } from '@/utils/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import axios, { AxiosInstance } from 'axios';
 import axiosRetry from 'axios-retry';
 import { zoho } from './_client';
+import { ZohoDeskOAuthType } from '@/types/zohodesk-oauth';
 
 export const ZDeskService = {
   createApiClient: (orgId: string, domain: string): AxiosInstance => {
@@ -45,6 +46,7 @@ export const ZDeskService = {
             );
 
             await supabase.from('zohodesk_oauth').update({ access_token }).eq('org_id', orgId);
+
 
             error.config.headers.Authorization = `Zoho-oauthtoken ${access_token}`;
             return client(error.config);

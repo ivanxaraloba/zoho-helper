@@ -19,11 +19,11 @@ export async function POST(req: NextRequest) {
     const tickets: TicketType[] = body?.ticketId
       ? [await apiDeskMigration.origin.get(`/tickets/${body.ticketId}`).then((res) => res.data)]
       : await getOriginTickets({
-          fromIndex: 0,
-          limit: 100,
-        });
+        fromIndex: 0,
+        limit: 100,
+      });
 
-    const chunks = chunk(tickets, 5);
+    const chunks = chunk(tickets, 8);
     let createdAll = [];
 
     for (const chunk of chunks) {
