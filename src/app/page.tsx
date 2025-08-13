@@ -6,7 +6,19 @@ import { Badge } from '@/components/ui/badge';
 import axios from 'axios';
 import { useMutation } from '@tanstack/react-query';
 import ButtonLoading from '@/components/ui/button-loading';
-import { ArrowRight, RefreshCw, Share2, FileJson, FileCode, Copy, Check, ChevronDown, Play } from 'lucide-react';
+import {
+  ArrowRight,
+  RefreshCw,
+  Share2,
+  FileJson,
+  FileCode,
+  Copy,
+  Check,
+  ChevronDown,
+  Play,
+  ChevronRight,
+  ChevronUp,
+} from 'lucide-react';
 import { useCopy } from '@/hooks/use-copy';
 import { TypographyH1 } from '@/components/typography/typography-h1';
 import { TypographyMuted } from '@/components/typography/typography-muted';
@@ -113,7 +125,7 @@ export default function Home() {
       </div>
       <div className="w-full space-y-6 mt-10">
         {apiRoutes.map((route) => (
-          <Collapsible key={route.endpoint}>
+          <Collapsible className="group" key={route.endpoint}>
             <Card>
               <CollapsibleTrigger className="text-start w-full">
                 <CardHeader className="flex-row items-center py-3 px-6 gap-6">
@@ -129,7 +141,8 @@ export default function Home() {
                     <CardDescription className="text-xs">{route.description}</CardDescription>
                   </div>
                   <div className="ml-auto flex items-center gap-2">
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown className="hidden size-4 group-data-[state=closed]:block" />
+                    <ChevronUp className="block size-4 group-data-[state=closed]:hidden" />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
