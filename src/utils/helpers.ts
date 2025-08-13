@@ -16,7 +16,7 @@ export const log = async (
   await axios.post("https://lobaadmin-zohofunctionstogit.vercel.app/api/logs", {
     type,
     notes,
-    projectUsername: "demo7",
+    projectUsername: "hyundai",
     function: "desk-import",
   });
 };

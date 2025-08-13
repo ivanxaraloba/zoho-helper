@@ -12,7 +12,6 @@ import { TypographyH1 } from '@/components/typography/typography-h1';
 import { TypographyMuted } from '@/components/typography/typography-muted';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { APP_URL, METHOD_COLORS } from '@/utils/contants';
-import { log } from '@/utils/helpers';
 import { supabase } from '@/lib/supabase/client';
 import { Textarea } from '@/components/ui/textarea';
 import React, { useState } from 'react';
