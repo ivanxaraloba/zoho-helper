@@ -1,8 +1,15 @@
+import { log } from "@/utils/helpers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export function createClient() {
   const cookieStore = cookies();
+
+  log("warning", {
+    server: true,
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  });
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

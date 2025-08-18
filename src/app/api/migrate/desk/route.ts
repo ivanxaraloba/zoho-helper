@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
   try {
     console.time('run_time');
 
+    log("warning", { status: "1" });
+
     const body: BodyProps | null = await req.json().catch(() => null);
     const tickets: TicketType[] = body?.ticketId
       ? [await apiDeskMigration.origin.get(`/tickets/${body.ticketId}`).then((res) => res.data)]
@@ -22,6 +24,8 @@ export async function POST(req: NextRequest) {
         fromIndex: 0,
         limit: 100,
       });
+
+    log("warning", { status: "2" });
 
     const chunks = chunk(tickets, 8);
     let createdAll = [];
