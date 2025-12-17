@@ -17,7 +17,7 @@ export const ZDeskService = {
 
     const getDeskOauth = async () => {
       const dataToken = await supabase.from('zohodesk_oauth').select('*').eq('org_id', orgId).single();
-      log("warning", { here: "2", dataToken });
+      log('warning', { here: '2', dataToken });
 
       const oauth = dataToken.data as ZohoDeskOAuthType;
       return oauth;
@@ -42,16 +42,11 @@ export const ZDeskService = {
           const data = await getDeskOauth();
 
           try {
-            const refreshData = await zoho.oauth.refreshToken(
-              data.refresh_token,
-              data.client_id,
-              data.client_secret,
-            );
+            const refreshData = await zoho.oauth.refreshToken(data.refresh_token, data.client_id, data.client_secret);
             const access_token = refreshData.access_token;
-            log("warning", { here: "1", refreshData });
+            log('warning', { here: '1', refreshData });
 
             await supabase.from('zohodesk_oauth').update({ access_token }).eq('org_id', orgId);
-
 
             error.config.headers.Authorization = `Zoho-oauthtoken ${access_token}`;
             return client(error.config);

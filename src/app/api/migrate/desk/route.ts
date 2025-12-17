@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { chunk, log, sleep } from '@/utils/helpers';
 import { createTargetTicket, countTicketsByOwner, getOriginTickets } from './actions';
-import { apiDeskMigration } from '@/services/zoho/_client';
+import { api } from '@/services/zoho/_client';
 
 interface BodyProps {
   ticketId?: 'string';
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     const body: BodyProps | null = await req.json().catch(() => null);
     const tickets: TicketType[] = body?.ticketId
-      ? [await apiDeskMigration.origin.get(`/tickets/${body.ticketId}`).then((res) => res.data)]
+      ? [await api.origin.get(`/tickets/${body.ticketId}`).then((res) => res.data)]
       : await getOriginTickets({
         fromIndex: 0,
         limit: 100,
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
         try {
           // veirfy if exists
           console.log(`- creating ticket: ${ticket.ticketNumber}`);
-          const responseExistsTicket = await apiDeskMigration.target.get(
+          const responseExistsTicket = await api.target.get(
             `/tickets/search?customField1=cf_imported_num_ticket:${ticket.ticketNumber}`,
           );
           const existsTicket = responseExistsTicket?.data?.data?.[0];

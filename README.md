@@ -23,7 +23,7 @@ Follow these steps to run the project locally:
    - ***Create a Self Client***  
    Go to [Zoho API Console](https://api-console.zoho.com/) and create a new Self Client with the following scopes:  
       ```bash
-      Desk.tickets.ALL, Desk.tasks.ALL, Desk.settings.ALL, Desk.events.ALL, Desk.search.READ, Desk.contacts.ALL
+      Desk.basic.ALL, Desk.community.ALL, Desk.tickets.ALL, Desk.tasks.ALL, Desk.settings.ALL, Desk.events.ALL, Desk.search.READ, Desk.contacts.ALL
       ```
 
    - ***Generate Tokens***  

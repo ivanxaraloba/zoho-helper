@@ -1,6 +1,8 @@
 import { configDeskMigration, configMappingOwners } from '@/configs/setup-migation-desk';
-import { apiDeskMigration } from '@/services/zoho/_client';
+import { api } from '@/services/zoho/_client';
+import { IDeskUpload, IDeskThread } from '@/types/zoho-responses';
 import { formatDatetime, log } from '@/utils/helpers';
+import axios from 'axios';
 import { fileTypeFromBuffer } from 'file-type';
 
 export const getTargetContactId = async (originContactEmail: string): Promise<string | undefined> => {
@@ -9,7 +11,7 @@ export const getTargetContactId = async (originContactEmail: string): Promise<st
 
   try {
     // Attempt to fetch the target contact
-    const targetResponse = await apiDeskMigration.target.get(`/contacts/search?email=${originContactEmail}`);
+    const targetResponse = await api.target.get(`/contacts/search?email=${originContactEmail}`);
     const targetContact = targetResponse?.data?.data?.[0] as ContactType;
     console.log({ targetContact: targetContact?.id });
 
@@ -18,7 +20,7 @@ export const getTargetContactId = async (originContactEmail: string): Promise<st
     console.log('Target contact not found');
 
     // If target contact doesn't exist, fetch the origin contact
-    const originResponse = await apiDeskMigration.origin.get(`/contacts/search?email=${originContactEmail}`);
+    const originResponse = await api.origin.get(`/contacts/search?email=${originContactEmail}`);
     const originContact = originResponse?.data?.data?.[0] as ContactType;
 
     if (!originContact) {
@@ -47,7 +49,7 @@ export const getTargetContactId = async (originContactEmail: string): Promise<st
     console.log({ originContact });
 
     // Create a new target contact with the sanitized origin contact
-    const createResponse = await apiDeskMigration.target.post('/contacts', originContact);
+    const createResponse = await api.target.post('/contacts', originContact);
 
     return createResponse?.data?.id;
   } catch (err) {
@@ -74,7 +76,7 @@ export const getOriginTickets = async ({
     let moreTickets = true;
 
     while (moreTickets) {
-      const response = await apiDeskMigration.origin.get('/tickets', {
+      const response = await api.origin.get('/tickets', {
         params: {
           viewId,
           from,
@@ -102,7 +104,7 @@ export const createTargetTicket = async (ticket: TicketType): Promise<TicketType
   console.log('running - createTargetTicket()');
 
   try {
-    const ticketResponse = await apiDeskMigration.origin.get(`/tickets/${ticket.id}`);
+    const ticketResponse = await api.origin.get(`/tickets/${ticket.id}`);
     const ticketDetails = ticketResponse.data;
 
     const keysToRemove: Array<keyof TicketType> = [
@@ -123,7 +125,7 @@ export const createTargetTicket = async (ticket: TicketType): Promise<TicketType
       'responseDueDate',
       'tagCount',
       'isEscalated',
-      "source"
+      'source',
     ];
     keysToRemove.forEach((key) => delete ticketDetails[key]);
 
@@ -149,33 +151,79 @@ export const createTargetTicket = async (ticket: TicketType): Promise<TicketType
         cf_imported_created_time: formatDatetime(ticketDetails.createdTime),
         cf_imported_num_ticket: ticketDetails.ticketNumber,
       },
-    };
+    } as TicketType;
 
-    // console.log("formattedTicket");
-    // console.log("old status", ticketDetails.status);
-    // console.log("statusType", formattedTicket.statusType);
-    // console.log("status", formattedTicket.status);
-
-    const createdTicketResponse = await apiDeskMigration.target.post('/tickets', formattedTicket);
+    const createdTicketResponse = await api.target.post('/tickets', formattedTicket);
 
     const createdTicket = createdTicketResponse.data;
 
-    const commentsResponse = await apiDeskMigration.origin.get(`/tickets/${ticket.id}/comments`);
+    const conversationsResponse = await api.origin.get(`/tickets/${ticket.id}/conversations`);
 
-    const comments = commentsResponse.data.data || [];
-    for (const comment of comments) {
-      await apiDeskMigration.target.post(`/tickets/${createdTicket.id}/comments`, {
-        contentType: 'html',
-        content: comment.content,
-        attachmentIds: comment.attachments.map((a: any) => a.id),
-      });
+    const conversations = conversationsResponse.data.data;
+    for (const conversation of conversations) {
+      switch (conversation.type) {
+        case 'comment':
+          console.log('comment ----------------------------------------------------------');
+
+          await api.target.post(`/tickets/${createdTicket.id}/comments`, {
+            contentType: 'html',
+            content: conversation.content,
+            attachmentIds: conversation.attachments?.map((a: any) => a.id),
+          });
+          break;
+        case 'thread': {
+          console.log('threads ----------------------------------------------------------');
+          if (formattedTicket.description?.startsWith(conversation.summary.slice(0, -5))) break;
+
+          const responseThread = await api.origin.get(`/tickets/${ticket.id}/threads/${conversation.id}`);
+          const thread = responseThread.data as IDeskThread;
+
+          const attachmentIds: string[] = await Promise.all(
+            (thread.attachments || []).map(async (attachment) => {
+              try {
+                const responseFile = await api.origin.get(attachment.href, {
+                  responseType: 'arraybuffer',
+                });
+
+                const blob = new Blob([responseFile.data], {
+                  type: responseFile.headers['content-type'] || 'application/octet-stream',
+                });
+
+                const formData = new FormData();
+                formData.append('file', blob, attachment.name);
+
+                const uploadResponse = await api.target.post('/uploads', formData);
+
+                const uploaded = uploadResponse.data as IDeskUpload;
+
+                return uploaded.id;
+              } catch (err) {
+                throw err;
+              }
+            }),
+          ).then((ids) => ids.filter(Boolean) as string[]);
+
+          await api.target.post(`/tickets/${createdTicket.id}/draftReply`, {
+            channel: 'EMAIL',
+            attachmentIds,
+            content: thread.content,
+            to: 'ivanxarathreads@loba.com',
+            fromEmailAddress: 'apoiocliente@hyundaiportugal.zohodesk.com',
+            contentType: 'html',
+          });
+
+          break;
+        }
+        default:
+          throw `--- skipping conversation type: ${conversation.type}`;
+      }
     }
 
-    const attachmentsResponse = await apiDeskMigration.origin.get(`/tickets/${ticket.id}/attachments`);
+    const attachmentsResponse = await api.origin.get(`/tickets/${ticket.id}/attachments`);
 
     const attachments = attachmentsResponse.data.data;
     for (const attachment of attachments) {
-      const attachmentResponse = await apiDeskMigration.origin.get(
+      const attachmentResponse = await api.origin.get(
         `/tickets/${ticket.id}/attachments/${attachment.id}/content?orgId=680853844`,
         {
           responseType: 'arraybuffer',
@@ -192,7 +240,7 @@ export const createTargetTicket = async (ticket: TicketType): Promise<TicketType
       const formData = new FormData();
       formData.append('file', file);
 
-      await apiDeskMigration.target.post(`/tickets/${createdTicket.id}/attachments`, formData, {
+      await api.target.post(`/tickets/${createdTicket.id}/attachments`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
